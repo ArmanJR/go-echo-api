@@ -1,5 +1,5 @@
 # Settings API
-This is a simple Go REST API for a `Settings` serivce, built on `Echo` framework.
+This is a simple Go REST API for a `Settings` service, built on `Echo` framework.
 
 ## Building & Running
 To build and run the application, run the following commands:
@@ -105,3 +105,5 @@ curl --request GET \
 ]
 ```
 
+## Author
+- Arman Jafarnezhad
