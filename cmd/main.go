@@ -14,6 +14,18 @@ import (
 	"github.com/armanjr/go-echo-api/middlewares"
 )
 
+// @title           Settings API
+// @version         1.0
+// @description     Simple settings API using Echo.
+
+// @license.name  MIT
+// @license.url   https://opensource.org/license/mit/
+
+// @host      localhost:8080
+// @BasePath  /
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	// Parse command line flags
 	port := flag.Int("port", 8080, "Server port")
@@ -43,6 +55,7 @@ func main() {
 
 	// Set up request handlers
 	h := handlers.NewSettingsHandler(pg, redis, *secret)
+	e.GET("/swagger.yaml", h.ServeSwagger)
 	e.GET("/", h.Hello)
 	e.POST("/signin", h.SignIn)
 	e.GET("/settings", h.GetSettings, middlewares.JWTMiddleware)

@@ -1,0 +1,12 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  description: Simple settings API using Echo.
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
+  title: Settings API
+  version: "1.0"
+paths: {}
+swagger: "2.0"

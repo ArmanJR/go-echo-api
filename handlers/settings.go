@@ -30,6 +30,17 @@ func NewSettingsHandler(pg *sql.DB, redis *redis.Client, secret string) *Setting
 	}
 }
 
+// ServeSwagger serves the OpenAPI documentation.
+// @Summary Serve OpenAPI documentation
+// @Description Serves the OpenAPI documentation in YAML format.
+// @Tags documentation
+// @Produce yaml
+// @Success 200 {file} swagger.yaml
+// @Router /swagger.yaml [get]
+func (h *SettingsHandler) ServeSwagger(c echo.Context) error {
+	return c.File("docs/swagger.yaml")
+}
+
 // Hello returns a welcome message.
 // @Summary Say hello
 // @Description Returns a welcome message.
@@ -43,6 +54,19 @@ func (h *SettingsHandler) Hello(c echo.Context) error {
 	})
 }
 
+// SignIn godoc
+// @Summary Sign in to the application
+// @Description Signs in a user and returns a JWT token
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param username body string true "Username"
+// @Param password body string true "Password"
+// @Success 200 {object} map[string]interface{} "Returns a JWT token"
+// @Failure 400 {object} map[string]interface{} "Invalid request"
+// @Failure 401 {object} map[string]interface{} "Incorrect username or password"
+// @Failure 500 {object} map[string]interface{} "Failed to sign token"
+// @Router /signin [post]
 func (h *SettingsHandler) SignIn(c echo.Context) error {
 	type request struct {
 		Username string `json:"username"`
@@ -68,6 +92,18 @@ func (h *SettingsHandler) SignIn(c echo.Context) error {
 	})
 }
 
+// GetSetting godoc
+// @Summary Get a setting
+// @Description Retrieves the value of a setting given a key
+// @Tags settings
+// @Param key path integer true "Setting key"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Setting
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /settings/{key} [get]
 func (h *SettingsHandler) GetSetting(c echo.Context) error {
 	key, err := strconv.Atoi(c.Param("key"))
 	if err != nil {
@@ -104,6 +140,15 @@ func (h *SettingsHandler) GetSetting(c echo.Context) error {
 	return c.JSON(http.StatusOK, setting)
 }
 
+// GetSettings godoc
+// @Summary Get all settings
+// @Description Get all settings sorted by id in descending order
+// @Tags settings
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Setting
+// @Failure 500 {object} ErrorResponse
+// @Router /settings [get]
 func (h *SettingsHandler) GetSettings(c echo.Context) error {
 	ctx := context.Background()
 
@@ -131,7 +176,17 @@ func (h *SettingsHandler) GetSettings(c echo.Context) error {
 	return c.JSON(http.StatusOK, settings)
 }
 
-// CreateSetting creates a new setting in the database and Redis cache
+// CreateSetting godoc
+// @Summary Create a new setting
+// @Description Create a new setting with a key, value, and TTL
+// @Tags settings
+// @Accept json
+// @Produce json
+// @Param setting body models.Setting true "New setting"
+// @Success 201 {object} models.Setting
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /settings [post]
 func (h *SettingsHandler) CreateSetting(c echo.Context) error {
 	// Parse request body
 	req := &models.Setting{}
@@ -163,7 +218,19 @@ func (h *SettingsHandler) CreateSetting(c echo.Context) error {
 	return c.JSON(http.StatusCreated, req)
 }
 
-// UpdateSetting updates an existing setting in the database and Redis cache
+// UpdateSetting godoc
+// @Summary Update a setting
+// @Description Update a setting's value or TTL by its key
+// @Tags settings
+// @Accept json
+// @Produce json
+// @Param key path string true "Key of the setting to update"
+// @Param body body models.Setting true "Request body with fields to update (value or TTL)"
+// @Success 200 {object} models.Setting
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /settings/{key} [put]
 func (h *SettingsHandler) UpdateSetting(c echo.Context) error {
 	key, err := url.QueryUnescape(c.Param("key"))
 	if err != nil {
